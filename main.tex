@@ -1,0 +1,290 @@
+%!TeX program = lualatex-dev
+\documentclass[a4paper,11pt]{article}
+
+\usepackage{minesweeper}
+\usepackage{listings} 
+\usepackage{lstautogobble}
+\usepackage{tabularx}
+
+\definecolor{bluekeywords}{rgb}{0.13, 0.13, 1}
+\definecolor{greencomments}{rgb}{0, 0.5, 0}
+\definecolor{redstrings}{rgb}{0.9, 0, 0}
+\definecolor{graynumbers}{rgb}{0.5, 0.5, 0.5}
+
+\lstset{
+    autogobble,
+    columns=fullflexible,
+    showspaces=false,
+    showtabs=false,
+    breaklines=true,
+    showstringspaces=false,
+    breakatwhitespace=true,
+    escapeinside={(*@}{@*)},
+    commentstyle=\color{greencomments},
+    keywordstyle=\color{bluekeywords},
+    stringstyle=\color{redstrings},
+    numberstyle=\color{graynumbers},
+    basicstyle=\ttfamily\footnotesize,
+    frame=l,
+    framesep=12pt,
+    xleftmargin=12pt,
+    tabsize=4,
+    captionpos=b,
+    language=tex
+}
+
+\title{\texttt{minesweeper} Package}
+\author{{\fontspec{Noto Color Emoji}[RawFeature={mode=harf}]🍊} (Keonwoo Kim)}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\vfill
+
+\begin{center}
+\begin{tikzpicture}
+    \DrawMines{
+        111 :        \\
+        2|311111.    \\
+        3*Xx1Xx1.    \\
+        2|311111.    \\
+        111_?__**    \\
+    }
+\end{tikzpicture}
+
+\vspace{2cm}
+
+\begin{tikzpicture}
+    \DrawMines[0.4]{
+        1~21 1221_____1~|~            \\
+        23~213||1_____13~             \\
+        2|32|3|3211 1112|~            \\
+        3|2223112|2 1|24||22|3|21~    \\
+        |211|1 13|2 12|4|41112111~    \\
+        12232212|3222334|31211__11~   \\
+        23||22|212|2||2|22|3|2 112~   \\
+        ||43|211 11344422113|2 1|3~   \\
+        3|3322_____1||2|1 1232124|~   \\
+        12|3|21____233211_1|3|21||~   \\
+        _12|4|211112|1__12324|4334~   \\
+        __113|32|11|21__1||12||2|2~   \\
+        111122|332211___233112222|~   \\
+        ~43|223|2~1111__1|1_____1~    \\
+        ~||32|323111|1__2331____1~    \\
+        ~~|2112|1__111__1|~1____1|~~~~\\
+    }
+\end{tikzpicture}
+\end{center}
+
+\vfill
+\null
+\newpage
+
+
+\section{Introduction}
+
+The \textsf{minesweeper} package provides a way to draw a picture of a minesweeper game, following the design of the `classical' minesweeper game, via a simple command.
+
+This package requires Lua\LaTeX, due to its internal implmentation using Lua. And to use colored emojis in the document, this package requires \TeX\ Live 2019 with November update, or equivalent. For the color emoji font, the `Noto Color Emoji' font is chosen, which can be downloaded from the GitHub repository \texttt{googlefonts/noto-emoji} or somewhere else. Finally, since this package use HarfBuzz via \texttt{luahbtex}, the document using this package \emph{should} be compiled using `lualatex-dev' command (at least for now). For some IDEs, you can achieve this by appending the following code at the very beginning of the \texttt{.tex} file.
+
+\medskip
+
+\verb|%!TeX program = lualatex-dev|
+
+
+
+\section{Interface}
+
+The main command is the following, \verb|\DrawMines[2]|:
+
+\begin{lstlisting}
+\begin{tikzpicture}
+    \DrawMines[(*@\textit{<scale factor>}@*)]{
+        ................ \\
+        ..(*@\textit{<characters>}@*).. \\
+        ................ \\
+    }
+\end{tikzpicture}
+\end{lstlisting}
+
+This command add the minesweeper screen into the \texttt{tikzpicture} environment, with the northwest coordinate \texttt{(0, 0)}. Any positive float can be the \texttt{\textit{<scale factor>}}, and it is set to 1 if omitted. Note that it represents the length of one cell, in the unit of centimeter.
+
+The valid tokens for the second argument, \texttt{\textit{<characters>}} are the following: blank space, line break character (\verb|\n|), digits from 1 to 8, any alphabet (small or capital), and special characters: \verb|~| (tilde), \texttt{*} (asterisk), \texttt{|} (pipe character), \texttt{.} (period), \texttt{:} (colon), and \verb|_| (underscore).
+
+\newpage
+
+\begin{tabular}{cc}
+\parbox{0.12\textwidth}{\tikzpicture\DrawMines[0.7]{_}\endtikzpicture} & \vspace*{5pt}
+\parbox{0.7\textwidth}{%
+    {\LARGE\textbf{\tt\textvisiblespace}\,/\,\textbf{\tt\_}}
+
+    \medskip
+    
+    Insert a pressed cell without anything. Note that blank spaces are \emph{trimmed} (due to better indentations) and \emph{deduplicated} (due to the \TeX\ engine). So when inserting normal pressed cells at the beginning or the end, or consecutively, the underscore (\_) will replace the blank space. You can think of \_ as a rigid version of \textvisiblespace. %
+} \vspace*{5pt}
+\\ \hline
+
+
+
+\parbox{0.12\textwidth}{\vspace*{8pt}\tikzpicture\DrawMines[0.7]{~}\endtikzpicture} & \vspace*{5pt}
+\parbox{0.7\textwidth}{%
+\vspace*{8pt}
+    {\LARGE\textbf{\tt\char`\~}}
+
+    \medskip
+    
+    Insert an unpressed cell without anything. %
+} \vspace*{5pt}
+\\ \hline
+
+
+
+\parbox{0.12\textwidth}{\vspace*{8pt}\tikzpicture\DrawMines[0.45]{12\\34\\56\\78}\endtikzpicture} & \vspace*{5pt}
+\parbox{0.7\textwidth}{%
+    \vspace*{8pt}
+    {\LARGE\bf\sf Digits (1\,--\,8)}
+
+    \medskip
+    
+    Insert a cell labeled by a digit from 1 to 8.
+} \vspace*{5pt}
+\\ \hline
+
+
+
+\parbox{0.12\textwidth}{\vspace*{8pt}\tikzpicture\DrawMines[0.45]{xX\\qQ}\endtikzpicture} & \vspace*{5pt}
+\parbox{0.7\textwidth}{%
+    \vspace*{8pt}
+    {\LARGE\bf\sf Alphabets (a\,--\,z, A\,--\,Z)}
+
+    \medskip
+    
+    Insert an unpressed cell labeled by a variable. Capital letters will be replaced by the negation of the corresponding variable.
+} \vspace*{5pt}
+\\ \hline
+
+
+
+\parbox{0.12\textwidth}{\vspace*{8pt}\tikzpicture\DrawMines[0.7]{*}\endtikzpicture} & \vspace*{5pt}
+\parbox{0.7\textwidth}{%
+\vspace*{8pt}
+    {\LARGE\textbf{\tt{*}}}
+
+    \medskip
+    
+    Insert a cell with a bomb. %
+} \vspace*{5pt}
+\\ \hline
+
+
+
+\parbox{0.12\textwidth}{\vspace*{8pt}\tikzpicture\DrawMines[0.7]{|}\endtikzpicture} & \vspace*{5pt}
+\parbox{0.7\textwidth}{%
+\vspace*{8pt}
+    {\LARGE\textbf{\tt{|}}}
+
+    \medskip
+    
+    Insert a cell with a flag. %
+} \vspace*{5pt}
+\\ \hline
+
+
+
+\parbox{0.12\textwidth}{\vspace*{8pt}\tikzpicture\DrawMines[0.7]{.}\endtikzpicture} & \vspace*{5pt}
+\parbox{0.7\textwidth}{%
+\vspace*{8pt}
+    {\LARGE\textbf{\tt{.}}}
+
+    \medskip
+    
+    Insert a pressed cell with horizontal dots. %
+} \vspace*{5pt}
+\\ \hline
+
+
+
+\parbox{0.12\textwidth}{\vspace*{8pt}\tikzpicture\DrawMines[0.7]{:}\endtikzpicture} & \vspace*{5pt}
+\parbox{0.7\textwidth}{%
+\vspace*{8pt}
+    {\LARGE\textbf{\tt{:}}}
+
+    \medskip
+    
+    Insert a pressed cell with vertical dots. %
+} \vspace*{5pt}
+\end{tabular}
+
+\newpage
+
+
+The above characters are given as the mandatory argument. A sample code is shown below.
+
+
+\begin{lstlisting}
+\begin{tikzpicture}
+    \DrawMines[0.4]{
+        1~21 1221_____1~|~            \\
+        23~213||1_____13~             \\
+        2|32|3|3211 1112|~            \\
+        3|2223112|2 1|24||22|3|21~    \\
+        |211|1 13|2 12|4|41112111~    \\
+        12232212|3222334|31211__11~   \\
+        23||22|212|2||2|22|3|2 112~   \\
+        ||43|211 11344422113|2 1|3~   \\
+        3|3322_____1||2|1 1232124|~   \\
+        12|3|21____233211_1|3|21||~   \\
+        _12|4|211112|1__12324|4334~   \\
+        __113|32|11|21__1||12||2|2~   \\
+        111122|332211___233112222|~   \\
+        ~43|223|2~1111__1|1_____1~    \\
+        ~||32|323111|1__2331____1~    \\
+        ~~|2112|1__111__1|~1____1|~~~~\\
+    }
+\end{tikzpicture}
+\end{lstlisting}
+
+
+Note that each line can have various length. But the figure will be created in a rectangular shape, fit to the maximum width and height, after trimming the blank spaces and blank lines. If a line with insufficient length ends with \texttt{\char`\~}, then the remaining cells are marked as unpressed. Otherwise, they are marked as pressed. For example,
+\begin{lstlisting}
+\begin{tikzpicture}
+    \DrawMines[0.8]{
+        1__4pP7|    \\
+        5X*
+    }
+\end{tikzpicture}
+\end{lstlisting}
+will be rendered as
+\begin{center}
+\begin{tikzpicture}
+    \DrawMines[0.8]{
+        1__4pP7|    \\
+        5X*
+    }
+\end{tikzpicture},
+\end{center}
+and
+\begin{lstlisting}
+\begin{tikzpicture}
+    \DrawMines[0.8]{
+        1__4pP7|    \\
+        5X*~
+    }
+\end{tikzpicture}
+\end{lstlisting}
+will be rendered as follows:
+\begin{center}
+\begin{tikzpicture}
+    \DrawMines[0.8]{
+        1__4pP7|    \\
+        5X*~
+    }
+\end{tikzpicture}.
+\end{center}
+
+
+
+
+
+\end{document}
