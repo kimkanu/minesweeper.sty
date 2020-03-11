@@ -5,6 +5,7 @@
 \RequirePackage{luacode}
 \RequirePackage{fontspec}
 \RequirePackage{xcolor}
+\RequirePackage{textcomp}
 
 
 %%%%%
@@ -22,6 +23,11 @@
 \definecolor{MINESWEEPERCOLORseven}{HTML}{000000}
 \definecolor{MINESWEEPERCOLOReight}{HTML}{808080}
 
+
+%%%%%
+% Fonts
+
+\newfontfamily{\MinesweeperFont}{Minesweeper}
 
 %%%%%
 % Constants
@@ -150,7 +156,7 @@ function draw_line(j, line, max_num_char)
                     )
                     tex.print(
                         string.format(
-                            "\\node at (%f, %f) { \\pgfmathparse{\\NumbersInEnglish[%d]}\\sffamily\\bfseries\\Huge\\textcolor{MINESWEEPERCOLOR\\pgfmathresult}{\\the\\numexpr%d\\relax}};",
+                            "\\node at (%f, %f) { \\pgfmathparse{\\NumbersInEnglish[%d]}\\MinesweeperFont\\fontsize{18pt}{18pt}\\selectfont\\textcolor{MINESWEEPERCOLOR\\pgfmathresult}{\\the\\numexpr%d\\relax}};",
                             i - 1 + 0.53125, -j + 0.5,
                             n, n
                         )
@@ -172,7 +178,7 @@ function draw_line(j, line, max_num_char)
 
                         tex.print(
                             string.format(
-                                "\\node at (%f, %f) {\\Large\\fontspec{Noto Color Emoji}[RawFeature={mode=harf}]{🚩}};",
+                                "\\node at (%f, %f) {\\MinesweeperFont\\fontsize{18pt}{18pt}\\selectfont|};",
                                 i - 0.5, -j + 0.5
                             )
                         )
@@ -198,7 +204,7 @@ function draw_line(j, line, max_num_char)
                         )
                         tex.print(
                             string.format(
-                                "\\node at (%f, %f) { \\LARGE\\fontspec{Noto Color Emoji}[RawFeature={mode=harf}]{💣}};",
+                                "\\node at (%f, %f) {\\MinesweeperFont\\fontsize{18pt}{18pt}\\selectfont*};",
                                 i - 1 + 0.53125, -j + 0.47
                             )
                         )
